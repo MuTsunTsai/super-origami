@@ -163,11 +163,13 @@ $glossary = wp_insert_post( array( 'post_type' => 'page', 'post_title' => 'Origa
 update_option( 'widget_search', array( 2 => array( 'title' => 'Search' ), '_multiwidget' => 1 ) );
 update_option( 'widget_recent-posts', array( 2 => array( 'title' => 'Popular Posts', 'number' => 5 ), '_multiwidget' => 1 ) );
 update_option( 'widget_categories', array( 2 => array( 'title' => 'Categories' ), '_multiwidget' => 1 ) );
+// 近期留言的 <li> 直接含有文字與行內元素，用來檢查清單排版
+update_option( 'widget_recent-comments', array( 2 => array( 'title' => 'Recent Comments', 'number' => 5 ), '_multiwidget' => 1 ) );
 update_option(
 	'sidebars_widgets',
 	array(
 		'wp_inactive_widgets' => array(),
-		'sidebar-right'       => array( 'search-2', 'recent-posts-2', 'categories-2' ),
+		'sidebar-right'       => array( 'search-2', 'recent-posts-2', 'recent-comments-2', 'categories-2' ),
 		'array_version'       => 3,
 	)
 );

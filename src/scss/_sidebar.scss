@@ -22,18 +22,22 @@
 		counter-reset: so-widget;
 	}
 
+	// 編號以絕對定位放在左側的 padding 中；不能用 grid 排版，
+	// 因為「近期留言」等小工具的 <li> 直接含有文字與行內元素，每一段都會變成獨立的格子
 	li {
 		counter-increment: so-widget;
-		display: grid;
-		grid-template-columns: 1.8rem 1fr;
-		padding: .4rem 0;
+		position: relative;
+		display: flow-root; // 包住 WordPress Popular Posts 浮動的縮圖
+		padding: .4rem 0 .4rem 1.8rem;
 		font-size: .92rem;
 		line-height: 1.45;
 		border-bottom: 1px dotted var(--so-rule);
 
 		&::before {
 			content: counter(so-widget, decimal-leading-zero);
-			padding-top: .15rem;
+			position: absolute;
+			top: .55rem;
+			left: 0;
 			font-family: $font-family-monospace;
 			font-size: .72rem;
 			color: var(--so-ink-soft);
@@ -45,7 +49,6 @@
 
 		// 巢狀清單（子分類、子選單）
 		ul, ol {
-			grid-column: 2;
 			margin-top: .25rem;
 		}
 
@@ -67,10 +70,6 @@
 	}
 
 	// WordPress Popular Posts 的縮圖與附加資訊
-	.wpp-list li {
-		align-items: start;
-	}
-
 	.wpp-thumbnail {
 		float: left;
 		margin: 0 .6rem .2rem 0;
