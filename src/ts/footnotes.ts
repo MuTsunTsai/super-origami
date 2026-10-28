@@ -7,6 +7,7 @@
  * - 文末：<div class="footnotes"><hr><ol><li id="fn:x"><p>…<a class="footnote-backref">↩</a></p></li></ol></div>
  */
 export function initFootnotes(): void {
+	repairNotes();
 	const refs = document.querySelectorAll<HTMLAnchorElement>(".entry-content a.footnote-ref");
 	if(!refs.length) return;
 
@@ -62,5 +63,23 @@ export function initFootnotes(): void {
 		ref.addEventListener("focus", () => show(ref));
 		ref.addEventListener("mouseleave", hide);
 		ref.addEventListener("blur", hide);
+	}
+}
+
+/**
+ * 有些文章文末註腳的內容被跳脫成文字，畫面上直接顯示 <p>、<a> 等原始碼（WordPress 產生內容時就是如此，與佈景主題無關）。
+ * 不在伺服器端修正，是因為 TranslatePress 的翻譯是以跳脫後的字串儲存的，改了就對不上翻譯；
+ * 這裡在 TranslatePress 翻譯完之後把文字還原成 HTML。內容是文章本身，不是訪客輸入的。
+ *
+ * 必須早於 front-end-glossary 外掛標記詞彙：它若先在跳脫的文字中插入標記，
+ * 經過 TranslatePress 的動態翻譯後文字會殘缺。外掛要先下載詞彙資料，目前總是比本腳本晚執行。
+ */
+function repairNotes(): void {
+	for(const li of document.querySelectorAll<HTMLLIElement>(".entry-content .footnotes li")) {
+		const text = li.textContent!.trim();
+		if(!text.startsWith("<") || li.querySelector("p")) continue;
+		// 已經是當前語言；否則 TranslatePress 的動態翻譯會把新插入的文字先清空再查詢翻譯
+		li.setAttribute("data-no-dynamic-translation", "");
+		li.innerHTML = text;
 	}
 }

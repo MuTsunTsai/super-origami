@@ -9,30 +9,49 @@
 
 declare global {
 	interface JQuery {
-		modulaGallery(options: object): JQuery;
+		modulaGallery?(options: object): JQuery;
+		modulaisotope?: unknown;
 	}
 	interface JQueryStatic {
 		modulaFancybox?: unknown;
+	}
+	interface Window {
+		DOMPurify?: unknown;
 	}
 }
 
 const MODULA_VERSION = "2.11.11";
 const MODULA_PATH = "/wp-content/plugins/modula-best-grid-gallery/assets";
-const MODULA_SCRIPTS = ["isotope.min.js", "isotope-packery.min.js", "purify.min.js", "modula-fancybox.min.js", "fancybox.min.js", "jquery-modula.min.js"];
 
-/** 相簿頁以外的頁面不會有 Modula 的資源，依序載入 */
+/**
+ * grid 型相簿需要的腳本（依載入順序），以及判斷是否已載入的方式。
+ * 頁面上若已有 Modula 相簿，外掛只會載入該相簿類型需要的部分（例如 justified 型沒有 isotope），所以要逐一檢查。
+ */
+const MODULA_SCRIPTS: [string, () => boolean][] = [
+	["isotope.min.js", () => !!jQuery.fn.modulaisotope],
+	// packery 是 isotope 的排版模式，外掛總是和 isotope 一起載入
+	["isotope-packery.min.js", () => !!jQuery.fn.modulaisotope],
+	["purify.min.js", () => !!window.DOMPurify],
+	["modula-fancybox.min.js", () => !!jQuery.modulaFancybox],
+	["fancybox.min.js", () => !!jQuery.modulaFancybox],
+	["jquery-modula.min.js", () => !!jQuery.fn.modulaGallery],
+];
+
+/** 載入缺少的 Modula 資源 */
 async function loadModula(): Promise<void> {
-	if(typeof jQuery.modulaFancybox != "undefined") return;
 	const url = (file: string): string => `${MODULA_PATH}/${file}?ver=${MODULA_VERSION}`;
 
-	const link = document.createElement("link");
-	link.rel = "stylesheet";
-	link.id = "modula-css";
-	link.href = url("css/front.css");
-	document.head.append(link);
+	if(!document.querySelector(`link[href*="${MODULA_PATH}/css/front.css"]`)) {
+		const link = document.createElement("link");
+		link.rel = "stylesheet";
+		link.href = url("css/front.css");
+		document.head.append(link);
+	}
 
+	// 先判斷完再插入，避免前面的腳本載入後改變後面的判斷結果；
 	// async = false：動態插入的腳本仍依插入順序執行
-	const scripts = MODULA_SCRIPTS.map(file => {
+	const missing = MODULA_SCRIPTS.filter(([, loaded]) => !loaded()).map(([file]) => file);
+	const scripts = missing.map(file => {
 		const script = document.createElement("script");
 		script.src = url(`js/front/${file}`);
 		script.async = false;
@@ -60,7 +79,7 @@ async function attach(img: HTMLImageElement): Promise<void> {
 		</div>`)
 		.before(`<a style="cursor: zoom-in" class="tile-inner modula-item-link">`)
 		.closest(".modula")
-		.modulaGallery({
+		.modulaGallery!({
 			lightboxOpts: { buttons: ["close"] },
 			type: "grid",
 		});
