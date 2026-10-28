@@ -1,0 +1,40 @@
+// 頂部導覽列：棕色漸層，疊上極淡的摺痕線稿底紋，下緣為栗色粗線。
+
+.site-nav {
+	background:
+		url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' fill='none' stroke='white' stroke-opacity='.07' stroke-width='1'><path d='M0 0L96 96M96 0L0 96M48 0V96M0 48H96M0 48L48 0L96 48L48 96Z'/></svg>"),
+		linear-gradient($brown, #7b3c10);
+	border-bottom: 3px solid var(--so-maroon);
+	box-shadow: 0 2px 10px rgba(60, 30, 10, .25);
+
+	.navbar-brand {
+		display: flex;
+		align-items: center;
+		gap: .6rem;
+		font-family: $font-family-serif;
+		font-size: 1.5rem;
+		font-weight: 600;
+		color: #fff;
+
+		img {
+			width: auto;
+			height: 1.4em;
+		}
+	}
+
+	.nav-link {
+		font-size: .95rem;
+		letter-spacing: .02em;
+	}
+
+	.navbar-toggler {
+		padding: .25rem .5rem;
+		font-size: 1.5rem;
+		color: #fff;
+		border-color: rgba(#fff, .35);
+	}
+
+	.dropdown-menu {
+		font-size: .95rem;
+	}
+}

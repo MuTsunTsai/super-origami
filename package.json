@@ -1,0 +1,36 @@
+{
+	"name": "super-origami",
+	"version": "1.0.0",
+	"private": true,
+	"description": "牧村摺紙（Tsai Origami）的 WordPress 佈景主題",
+	"type": "module",
+	"scripts": {
+		"build": "node scripts/icons.mjs && rsbuild build",
+		"watch": "node scripts/icons.mjs && rsbuild build --watch",
+		"preview": "wp-playground-cli server --port=9401 --mount-dir ./theme /wordpress/wp-content/themes/super-origami --mount-dir ./preview /wordpress/preview --mount-dir ../front-end-glossary/src /wordpress/wp-content/plugins/front-end-glossary--blueprint=./preview/blueprint.json --login",
+		"typecheck": "tsc --noEmit",
+		"package": "node scripts/package.mjs",
+		"release": "node scripts/release.mjs",
+		"icons": "node scripts/icons.mjs"
+	},
+	"dependencies": {
+		"@fontsource-variable/cormorant-garamond": "^5.3.0",
+		"@fontsource-variable/ibm-plex-sans": "^5.3.0",
+		"@fontsource/ibm-plex-mono": "^5.3.0",
+		"bootstrap": "^5.3.8",
+		"bootstrap-icons": "^1.13.2",
+		"katex": "^0.19.1",
+		"shiki": "^4.5.0"
+	},
+	"devDependencies": {
+		"@rsbuild/core": "^2.2.14",
+		"@rsbuild/plugin-sass": "^2.0.1",
+		"@types/bootstrap": "^5.2.11",
+		"@types/jquery": "^4.0.1",
+		"@wp-playground/cli": "^3.1.61",
+		"fflate": "^0.8.3",
+		"subset-font": "^2.9.0",
+		"typescript": "^7.0.2"
+	},
+	"packageManager": "pnpm@12.6.0"
+}

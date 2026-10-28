@@ -1,0 +1,84 @@
+// 全站基礎：方格紙底、標題、共用元件。
+
+html {
+	// 從錨點跳轉時，目標不要貼齊視窗頂端
+	scroll-padding-top: 1.5rem;
+}
+
+// 注意：不要在 body 上設定 position，會影響 WordPress admin bar 與外掛的定位
+body {
+	background-color: var(--so-paper);
+	background-image:
+		linear-gradient(var(--so-grid-major) 1px, transparent 1px),
+		linear-gradient(90deg, var(--so-grid-major) 1px, transparent 1px),
+		linear-gradient(var(--so-grid) 1px, transparent 1px),
+		linear-gradient(90deg, var(--so-grid) 1px, transparent 1px);
+	background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	// Cormorant Garamond 預設是舊式數字（例如「2o13」）
+	font-variant-numeric: lining-nums;
+}
+
+a:hover {
+	color: $link-hover-color;
+}
+
+::selection {
+	background: rgba($brown, .2);
+}
+
+.skip-link:focus {
+	position: absolute;
+	z-index: 1100;
+	top: .5rem;
+	left: .5rem;
+	padding: .5rem 1rem;
+	color: #fff;
+	background: var(--so-ink);
+}
+
+.mono {
+	@include so-label;
+}
+
+.mountain {
+	@include so-mountain-line;
+	margin: 1.75rem 0;
+}
+
+.btn-ink {
+	--bs-btn-color: #fff;
+	--bs-btn-bg: var(--so-ink);
+	--bs-btn-border-color: var(--so-ink);
+	--bs-btn-hover-color: #fff;
+	--bs-btn-hover-bg: var(--so-brown);
+	--bs-btn-hover-border-color: var(--so-brown);
+	--bs-btn-active-color: #fff;
+	--bs-btn-active-bg: var(--so-brown-deep);
+	--bs-btn-active-border-color: var(--so-brown-deep);
+	font-size: .75rem;
+	letter-spacing: .1em;
+	text-transform: uppercase;
+}
+
+// 從錨點連結（例如註腳）跳轉過來時，目標短暫高亮
+:target {
+	animation: so-target-flash 2.5s ease-out;
+}
+
+@keyframes so-target-flash {
+	0%, 30% {
+		background-color: var(--so-highlight);
+	}
+}
+
+// 頁面主體與上下區塊的間距
+.site-main {
+	padding-bottom: 3rem;
+}
+
+.page-top {
+	padding-top: 2.5rem;
+}

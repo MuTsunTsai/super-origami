@@ -1,0 +1,57 @@
+// 頁尾：山線之上可放小工具（footer1），之下是版權列。
+
+.site-footer {
+	padding: 0 0 2.5rem;
+
+	&__widgets {
+		margin-bottom: .5rem;
+
+		.widget {
+			padding: 0;
+			background: none;
+			border: 0;
+
+			&::before {
+				content: none;
+			}
+		}
+	}
+
+	.mountain {
+		margin: 0 0 1.25rem;
+	}
+
+	&__bar {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: .5rem 1.5rem;
+
+		a {
+			color: inherit;
+
+			&:hover {
+				color: var(--so-brown);
+			}
+		}
+	}
+}
+
+.error-404 {
+	padding: 3rem 2rem;
+	text-align: center;
+
+	&__code {
+		margin: 0;
+		font-family: $font-family-serif;
+		font-size: 6rem;
+		font-weight: 600;
+		line-height: 1;
+		color: var(--so-brown);
+	}
+
+	.search-form {
+		max-width: 24rem;
+		margin: 1.5rem auto;
+	}
+}

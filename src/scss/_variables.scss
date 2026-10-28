@@ -1,0 +1,51 @@
+// Bootstrap 變數覆寫。只放 Bootstrap 本身認得的變數；佈景主題自己的設計 token 在 _tokens.scss。
+
+// 色彩：主色沿用舊站導覽列的 saddlebrown
+$brown: #8b4513;
+$primary: $brown;
+$secondary: #6f655c;
+$danger: #b3261e;
+$success: #4d7c2a;
+
+$body-bg: #fbf9f4;
+$body-color: #26211d;
+$body-secondary-color: #6f655c;
+$border-color: #cdbfa9;
+$link-color: $brown;
+$link-hover-color: #5a2c0c;
+$link-decoration: none;
+$link-underline-offset: 3px;
+$headings-color: $body-color;
+$code-color: #5a2c0c;
+
+// 字型：襯線標題（Cormorant Garamond）、無襯線內文（IBM Plex Sans）、等寬中繼資料（IBM Plex Mono）
+// 中文沒有打包網頁字型（體積太大），交給系統字型
+$font-family-serif: "Cormorant Garamond Variable", "Noto Serif TC", "Source Han Serif TC", "PMingLiU", serif;
+$font-family-sans-serif: "IBM Plex Sans Variable", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+$font-family-monospace: "IBM Plex Mono", Consolas, "Noto Sans TC", "Microsoft JhengHei", monospace;
+$font-size-base: 1rem;
+$line-height-base: 1.75;
+$headings-font-family: $font-family-serif;
+$headings-font-weight: 600;
+$headings-line-height: 1.15;
+
+// 形狀：製圖風，一律直角
+$enable-rounded: false;
+$enable-shadows: false;
+$border-radius: 0;
+$border-radius-sm: 0;
+$border-radius-lg: 0;
+
+// 元件
+$navbar-padding-y: .625rem;
+$navbar-dark-color: rgba(#fff, .78);
+$navbar-dark-hover-color: #fff;
+$navbar-dark-active-color: #fff;
+$input-border-color: $body-color;
+$input-focus-border-color: $brown;
+$input-btn-focus-color-opacity: .2;
+$input-font-family: $font-family-monospace;
+$input-font-size: .85rem;
+$btn-font-family: $font-family-monospace;
+$dropdown-border-color: $body-color;
+$dropdown-link-active-bg: $brown;

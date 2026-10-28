@@ -1,0 +1,34 @@
+// 卡片（sheet）：純白底、細框，四角是箱形褶角落的摺痕。
+// 文章裡的圖片多半假定白底，所以卡片必須維持純白，圖片才能直接融入。
+
+.sheet {
+	position: relative;
+	background: #fff;
+	border: 1px solid var(--so-rule);
+	@include so-box-pleat-corners;
+}
+
+// 分頁
+.pager {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: .5rem 1rem;
+	margin-top: 1rem;
+
+	a {
+		color: var(--so-brown);
+	}
+
+	&__pages {
+		display: flex;
+		flex-wrap: wrap;
+		gap: .25rem .75rem;
+
+		.current {
+			color: var(--so-ink);
+			font-weight: 500;
+		}
+	}
+}

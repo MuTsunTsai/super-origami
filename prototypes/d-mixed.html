@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Prototype D：混搭（B 為基礎＋A 的導覽列）</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500..700;1,500..700&family=Noto+Serif+TC:wght@500;700&family=IBM+Plex+Sans:ital,wght@0,400..600;1,400..600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" rel="stylesheet">
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+	<script defer src="shared.js"></script>
+	<style>
+		:root {
+			--paper: #fbf9f4;
+			--grid: rgba(139, 69, 19, .055);
+			--grid-major: rgba(139, 69, 19, .1);
+			--ink: #26211d;
+			--ink-soft: #6f655c;
+			--brown: #8b4513;
+			--brown-deep: #5a2c0c;
+			--rule: #cdbfa9;
+			--serif: "Cormorant Garamond", "Noto Serif TC", serif;
+			--sans: "IBM Plex Sans", "PingFang TC", "Microsoft JhengHei", sans-serif;
+			--mono: "IBM Plex Mono", Consolas, monospace;
+			--maroon: #7a1f12;
+			/* 山線的一個週期：槓（14px）＋兩個圓點（直徑 2.8px，比 2px 的線稍粗） */
+			--mountain-tile: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='4' fill='%238b4513'><rect x='0' y='1' width='14' height='2'/><circle cx='18.5' cy='2' r='1.4'/><circle cx='23.5' cy='2' r='1.4'/></svg>");
+		}
+		body {
+			background-color: var(--paper);
+			background-image:
+				linear-gradient(var(--grid-major) 1px, transparent 1px),
+				linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+				linear-gradient(var(--grid) 1px, transparent 1px),
+				linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+			background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+			color: var(--ink);
+			font-family: var(--sans);
+			font-size: 1rem;
+			line-height: 1.75;
+		}
+		a { color: var(--brown); text-underline-offset: 3px; }
+		h1, h2, h3, .serif { font-family: var(--serif); font-weight: 600; font-variant-numeric: lining-nums; }
+		.entry .fig b { font-variant-numeric: lining-nums; }
+		.mono { font-family: var(--mono); font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-soft); }
+
+		/* 導覽列（取自 A）：棕色，疊上極淡的摺痕線稿 */
+		.site-nav {
+			background:
+				url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96' fill='none' stroke='white' stroke-opacity='.07' stroke-width='1'><path d='M0 0L96 96M96 0L0 96M48 0V96M0 48H96M0 48L48 0L96 48L48 96Z'/></svg>"),
+				linear-gradient(var(--brown), #7b3c10);
+			border-bottom: 3px solid var(--maroon);
+			box-shadow: 0 2px 10px rgba(60, 30, 10, .25);
+		}
+		.site-nav .navbar-brand { display: flex; align-items: center; gap: .6rem; font-family: var(--serif); font-size: 1.5rem; font-weight: 600; color: #fff; }
+		.site-nav .navbar-brand img { height: 1.4em; }
+		.site-nav .nav-link { color: rgba(255, 255, 255, .78); font-size: .95rem; letter-spacing: .02em; }
+		.site-nav .nav-link:hover { color: #fff; }
+		.lang-switch { font-size: .85rem; color: rgba(255, 255, 255, .8); border: 1px solid rgba(255, 255, 255, .35); border-radius: 2rem; padding: .15rem .75rem; }
+
+		/* 頁首：圖版（plate）加對位標記 */
+		.plate-wrap { padding: 2.5rem 0 1rem; }
+		.plate { position: relative; border: 1px solid var(--ink); background: #fff; padding: 10px; }
+		.plate .img { height: 260px; background: url("https://origami.abstreamace.com/wp-content/uploads/2022/04/cropped-preview.png") center / cover; filter: sepia(.35) contrast(1.05); }
+		.plate .reg { position: absolute; width: 18px; height: 18px; border: 1px solid var(--brown); border-radius: 50%; }
+		.plate .reg::before, .plate .reg::after { content: ""; position: absolute; background: var(--brown); }
+		.plate .reg::before { left: 50%; top: -6px; bottom: -6px; width: 1px; }
+		.plate .reg::after { top: 50%; left: -6px; right: -6px; height: 1px; }
+		.plate .r1 { top: -9px; left: -9px; } .plate .r2 { top: -9px; right: -9px; } .plate .r3 { bottom: -9px; left: -9px; } .plate .r4 { bottom: -9px; right: -9px; }
+		.plate-caption { display: flex; justify-content: space-between; margin-top: .8rem; }
+		.tagline { font-family: var(--serif); font-size: 1.6rem; font-style: italic; margin: 1.5rem 0 0; }
+		/*
+		 * 山線（一點鏈線，點為圓點）。仿照 Inkscape「Pattern along path」的「重複、伸展」：
+		 * 週期以 round 伸縮成整數個，右側再補一段槓，讓線的兩端都收在槓上。
+		 */
+		.mountain {
+			height: 4px; margin: 1.75rem 0; padding-right: 14px; opacity: .6;
+			background:
+				var(--mountain-tile) left center / 28px 4px round no-repeat content-box,
+				linear-gradient(var(--brown), var(--brown)) right center / 14px 2px no-repeat border-box;
+			background-origin: content-box, border-box;
+			background-clip: content-box, border-box;
+		}
+
+		/* 卡片：細黑框＋回字紋四角 */
+		.sheet { position: relative; background: #fff; border: 1px solid var(--rule); }
+		.sheet::before {
+			content: ""; position: absolute; inset: 0; pointer-events: none; background: var(--brown); opacity: .75;
+			--tl: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='35' height='35' fill='none' stroke='black' stroke-width='1.2'><g transform='scale(2.5)'><path d='M1 18L1 7L2 7L2 6L1 6L1 5L3 5L3 1L4 1L4 2L1 2L1 1L2 1L2 4L1 4L1 3L5 3L5 1L6 1L6 2L7 2L7 1L18 1' vector-effect='non-scaling-stroke'/></g></svg>");
+			--tr: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='35' height='35' fill='none' stroke='black' stroke-width='1.2'><g transform='matrix(-1 0 0 1 35 0)'><g transform='scale(2.5)'><path d='M1 18L1 7L2 7L2 6L1 6L1 5L3 5L3 1L4 1L4 2L1 2L1 1L2 1L2 4L1 4L1 3L5 3L5 1L6 1L6 2L7 2L7 1L18 1' vector-effect='non-scaling-stroke'/></g></g></svg>");
+			--bl: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='35' height='35' fill='none' stroke='black' stroke-width='1.2'><g transform='matrix(1 0 0 -1 0 35)'><g transform='scale(2.5)'><path d='M1 18L1 7L2 7L2 6L1 6L1 5L3 5L3 1L4 1L4 2L1 2L1 1L2 1L2 4L1 4L1 3L5 3L5 1L6 1L6 2L7 2L7 1L18 1' vector-effect='non-scaling-stroke'/></g></g></svg>");
+			--br: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='35' height='35' fill='none' stroke='black' stroke-width='1.2'><g transform='matrix(-1 0 0 -1 35 35)'><g transform='scale(2.5)'><path d='M1 18L1 7L2 7L2 6L1 6L1 5L3 5L3 1L4 1L4 2L1 2L1 1L2 1L2 4L1 4L1 3L5 3L5 1L6 1L6 2L7 2L7 1L18 1' vector-effect='non-scaling-stroke'/></g></g></svg>");
+			mask: var(--tl) top 1.5px left 1.5px / 35px no-repeat, var(--tr) top 1.5px right 1.5px / 35px no-repeat, var(--bl) bottom 1.5px left 1.5px / 35px no-repeat, var(--br) bottom 1.5px right 1.5px / 35px no-repeat;
+			-webkit-mask: var(--tl) top 1.5px left 1.5px / 35px no-repeat, var(--tr) top 1.5px right 1.5px / 35px no-repeat, var(--bl) bottom 1.5px left 1.5px / 35px no-repeat, var(--br) bottom 1.5px right 1.5px / 35px no-repeat;
+		}
+
+		/* 文章列表：像圖錄條目 */
+		.entry { display: grid; grid-template-columns: 5.5rem 1fr; gap: 0 1.5rem; padding: 1.75rem 2rem; border-bottom: 1px solid var(--rule); }
+		.entry:last-of-type { border-bottom: 0; }
+		.entry .fig { font-family: var(--mono); color: var(--brown); font-size: .75rem; letter-spacing: .08em; padding-top: .55rem; border-top: 2px solid var(--brown); align-self: start; }
+		.entry .fig b { display: block; font-family: var(--serif); font-size: 2.4rem; line-height: 1; letter-spacing: 0; color: var(--ink); margin-top: .3rem; }
+		.entry-title { font-size: 1.95rem; line-height: 1.15; margin: .2rem 0 .5rem; }
+		.entry-title a { color: var(--ink); text-decoration: none; }
+		.entry-title a:hover { color: var(--brown); }
+		.entry p { color: #4a423b; margin-bottom: .4rem; }
+
+		/* 側欄 */
+		.widget { padding: 1.4rem 1.6rem; margin-bottom: 1.5rem; }
+		.widget-title { font-family: var(--mono); font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; color: var(--brown); margin-bottom: .75rem; padding-bottom: .5rem; border-bottom: 1px solid var(--ink); }
+		.widget ol { list-style: none; counter-reset: w; padding: 0; margin: 0; }
+		.widget ol li { counter-increment: w; display: grid; grid-template-columns: 1.8rem 1fr; padding: .4rem 0; border-bottom: 1px dotted var(--rule); font-size: .92rem; line-height: 1.45; }
+		.widget ol li::before { content: counter(w, decimal-leading-zero); font-family: var(--mono); font-size: .72rem; color: var(--ink-soft); padding-top: .15rem; }
+		.widget ol li:last-child { border-bottom: 0; }
+		.widget a { color: var(--ink); text-decoration: none; }
+		.widget a:hover { color: var(--brown); }
+		.form-control { border-radius: 0; border-color: var(--ink); font-family: var(--mono); font-size: .85rem; }
+		.btn-ink { border-radius: 0; background: var(--ink); color: #fff; font-family: var(--mono); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; }
+		.btn-ink:hover { background: var(--brown); color: #fff; }
+
+		/* 單篇 */
+		.divider-label { text-align: center; margin: 3.5rem 0 1.5rem; }
+		.article { padding: 3rem 3.5rem; }
+		.article h1 { font-size: 2.9rem; line-height: 1.08; margin: .5rem 0 1rem; }
+		.article .meta-row { display: flex; flex-wrap: wrap; gap: 1.5rem; padding: .6rem 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule); margin-bottom: 2rem; }
+		.article .meta-row div span { display: block; color: var(--ink); font-size: .85rem; letter-spacing: 0; text-transform: none; font-family: var(--sans); }
+		.article { counter-reset: sec; }
+		.article h2 { counter-increment: sec; font-size: 1.85rem; margin: 2.5rem 0 1rem; }
+		.article h2::before { content: "§" counter(sec) " "; font-family: var(--mono); font-size: .9rem; color: var(--brown); vertical-align: .35em; margin-right: .4rem; }
+		.article figure { margin: 2rem 0; }
+		/* 圖片多半假定白底，直接融進白色卡片，不加外框 */
+		.article figure img { max-width: 100%; display: block; margin: 0 auto; }
+		.article figcaption { font-family: var(--mono); font-size: .75rem; color: var(--ink-soft); text-align: center; margin-top: .5rem; letter-spacing: .04em; }
+		.article blockquote { margin: 1.5rem 0; padding: 0 0 0 1.25rem; border-left: 1px solid var(--ink); font-family: var(--serif); font-size: 1.3rem; font-style: italic; line-height: 1.5; }
+		.article blockquote p:last-child { margin: 0; }
+		.article :not(pre) > code { font-family: var(--mono); font-size: .85em; color: var(--brown-deep); background: rgba(139, 69, 19, .07); padding: .05em .3em; }
+		.article pre { font-family: var(--mono); font-size: .85rem; line-height: 1.65; background: #fdfcf8; border: 1px solid var(--ink); padding: 1rem 1.25rem; position: relative; border-radius: 0; }
+		.article pre::before { content: "JAVA"; position: absolute; top: -.6rem; right: 1rem; background: var(--paper); padding: 0 .4rem; font-size: .68rem; letter-spacing: .12em; color: var(--brown); }
+		.tok-k { color: #a0451b; } .tok-t { color: #2f6f73; } .tok-s { color: #5f7f2a; } .tok-c { color: #9a8b7a; font-style: italic; } .tok-n { color: #7b4fa0; }
+		.article kbd { font-family: var(--mono); font-size: .78em; background: #fff; color: var(--ink); border: 1px solid var(--ink); border-radius: 2px; box-shadow: 0 2px 0 var(--ink); }
+		.katex-block { margin: 1.5rem 0; padding: 1rem; border-top: 1px dashed var(--rule); border-bottom: 1px dashed var(--rule); overflow-x: auto; }
+		sup a { text-decoration: none; font-family: var(--mono); font-size: .75rem; }
+		.footnotes { font-size: .85rem; color: var(--ink-soft); }
+		.feg { border-bottom: 1px dotted var(--brown); cursor: help; }
+		.feg-popover { display: none; position: absolute; z-index: 10; max-width: 300px; background: #fff; border: 1px solid var(--ink); padding: .75rem 1rem; font-size: .88rem; line-height: 1.5; box-shadow: 4px 4px 0 rgba(139, 69, 19, .2); }
+		.feg-popover b { font-family: var(--mono); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--brown); display: block; margin-bottom: .2rem; }
+
+		.site-footer { margin-top: 3rem; padding: 0 0 2.5rem; }
+		.site-footer .mountain { margin: 0 0 1.25rem; }
+
+		@media (max-width: 575.98px) {
+			.entry { grid-template-columns: 1fr; padding: 1.5rem 1.25rem; }
+			.entry .fig { display: flex; gap: .75rem; align-items: baseline; border: 0; padding: 0; }
+			.entry .fig b { font-size: 1.2rem; }
+			.article { padding: 1.75rem 1.25rem; }
+			.article h1 { font-size: 2.1rem; }
+			.plate .img { height: 160px; }
+		}
+	</style>
+</head>
+<body>
+	<nav class="navbar navbar-expand-lg navbar-dark site-nav">
+		<div class="container">
+			<a class="navbar-brand" href="#"><img src="https://origami.abstreamace.com/wp-content/uploads/2021/05/162233760685302-1.png" alt="牧村摺紙">Tsai Origami</a>
+			<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+			<div class="collapse navbar-collapse" id="nav">
+				<ul class="navbar-nav me-auto">
+					<li class="nav-item"><a class="nav-link" href="#">Origami glossary</a></li>
+					<li class="nav-item"><a class="nav-link" href="#">About Mu-Tsun Tsai</a></li>
+				</ul>
+				<span class="lang-switch">EN · 繁中</span>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container plate-wrap">
+		<div class="plate">
+			<div class="img"></div>
+			<span class="reg r1"></span><span class="reg r2"></span><span class="reg r3"></span><span class="reg r4"></span>
+		</div>
+		<div class="plate-caption mono"><span>Plate I — Diagrams, 2013–2025</span><span>Scale 1 : 1</span></div>
+		<p class="tagline">Origami works, research and programming by Mu-Tsun Tsai</p>
+		<div class="mountain"></div>
+	</div>
+
+	<main class="container mb-5">
+		<div class="row g-4 g-xl-5">
+			<div class="col-lg-8">
+				<div class="sheet">
+					<article class="entry">
+						<div class="fig">FIG.<b>01</b></div>
+						<div>
+							<div class="mono">Designs · 2025-06-19</div>
+							<h2 class="entry-title"><a href="#">Impressionist Bat, 2013</a></h2>
+							<p>This is one of my earliest original designs, yet even to this day, it remains one of the works I am most satisfied with—primarily because of the successful <span class="feg" data-content="<b>Glossary · Shaping</b>The final stage of folding where the base is refined into the subject's form.">shaping</span> of the head…</p>
+							<a class="mono text-decoration-none" href="#" style="color:var(--brown)">Read →</a>
+						</div>
+					</article>
+					<article class="entry">
+						<div class="fig">FIG.<b>02</b></div>
+						<div>
+							<div class="mono">Designs · 2023-09-11</div>
+							<h2 class="entry-title"><a href="#">Pinwheel without cuts, 2016</a></h2>
+							<p>I was deeply honored to receive an invitation to teach at the 4th Origami World Marathon (OWM4). Among the various origami models I proposed…</p>
+							<a class="mono text-decoration-none" href="#" style="color:var(--brown)">Read →</a>
+						</div>
+					</article>
+					<article class="entry">
+						<div class="fig">FIG.<b>03</b></div>
+						<div>
+							<div class="mono">Essays · 2021-12-12 · 4 comments</div>
+							<h2 class="entry-title"><a href="#">Geography of Origami – A Brief Introduction to the Edge-River Method</a></h2>
+							<p>Recently I had been discussing my edge-river method (ERM) with several folders on Discord and received fairly good responses…</p>
+							<a class="mono text-decoration-none" href="#" style="color:var(--brown)">Read →</a>
+						</div>
+					</article>
+				</div>
+				<div class="d-flex justify-content-between mt-3 mono"><a href="#" class="text-decoration-none">← Older</a><span>Page 1 / 4</span></div>
+
+				<p class="divider-label mono">— single post —</p>
+
+				<article class="sheet article">
+					<div class="mono">Essays / ERM</div>
+					<h1>Geography of Origami – A Brief Introduction to the Edge-River Method</h1>
+					<div class="meta-row mono">
+						<div>Published<span>2021-12-12</span></div>
+						<div>Author<span>Mu-Tsun Tsai</span></div>
+						<div>Comments<span>4</span></div>
+					</div>
+					<p>Recently I had been discussing my edge-river method (ERM) with several folders on Discord and received fairly good responses. I will assume that the readers are considerably familiar with the <span class="feg" data-content="<b>Glossary · Tree method</b>A design technique that represents the subject as a stick figure and solves a circle/river packing.">tree method</span> (developed by Lang and Meguro, etc.).</p>
+					<h2>Overview</h2>
+					<p>To put it simply, ERM is a generalization of the tree method to any origami design, let it be uniaxial or not. Roughly speaking, the tree method can be thought of as a design process consisting of the following steps:</p>
+					<ol>
+						<li>Represent the target subject as a tree figure.</li>
+						<li>Solve the circle/river packing problem to decide the correspondence between regions on the sheet and components on the tree.</li>
+						<li>Construct a flat-foldable crease pattern for the packing, so that the sheet collapses to a base resembling the tree.<sup><a href="#">[1]</a></sup></li>
+					</ol>
+					<figure>
+						<img src="https://origami.abstreamace.com/wp-content/uploads/2021/08/image-1630831358273.png" alt="">
+						<figcaption>FIGURE 1. 1D vs 2D animal.</figcaption>
+					</figure>
+					<p>For a grid of size <code class="katex-inline">n \times n</code>, each flap of length <code class="katex-inline">\ell</code> consumes a river of width <code class="katex-inline">w = \ell / \sqrt{2}</code>, so that the total area satisfies</p>
+					<pre><code class="language-katex">\sum_{i} \pi r_i^2 + \sum_{j} w_j L_j \le n^2</code></pre>
+					<blockquote><p>An abstraction can be viewed as the specification given by the designer for the desired shape of the folded base.</p></blockquote>
+					<h2>Implementation</h2>
+					<p>Press <kbd>Ctrl</kbd> + <kbd>Z</kbd> to undo. In <code>Orihime</code>, the core loop looks like this:</p>
+<pre><code><span class="tok-c">// Fold every crease that lies on the current layer</span>
+<span class="tok-k">for</span> (<span class="tok-t">LineSegment</span> s : creases) {
+	<span class="tok-k">if</span> (s.<span class="tok-n">getColor</span>() == <span class="tok-t">LineColor</span>.RED_1) {
+		folder.<span class="tok-n">fold</span>(s, <span class="tok-s">"mountain"</span>);
+	}
+}</code></pre>
+					<div class="mountain"></div>
+					<div class="footnotes"><ol><li>In some cases, it might be necessary to use 2-unit wide peninsulas due to the parity principle of box pleating. <a href="#">↩</a></li></ol></div>
+				</article>
+			</div>
+
+			<aside class="col-lg-4">
+				<div class="sheet widget">
+					<h3 class="widget-title">Search</h3>
+					<form class="d-flex"><input class="form-control" placeholder="keyword"><button class="btn btn-ink px-3" type="button">Go</button></form>
+				</div>
+				<div class="sheet widget">
+					<h3 class="widget-title">Popular Posts</h3>
+					<ol>
+						<li><a href="#">Geography of Origami – A Brief Introduction to the Edge-River Method</a></li>
+						<li><a href="#">The story of Box Pleating Studio</a></li>
+						<li><a href="#">Sauwastika, 2021</a></li>
+						<li><a href="#">Fold a full Ryujin 3.5 with Orihime algorithm</a></li>
+						<li><a href="#">Origami Nature Study by Shuki Kato</a></li>
+					</ol>
+				</div>
+				<div class="sheet widget">
+					<h3 class="widget-title">Categories</h3>
+					<ol>
+						<li><a href="#">Designs</a></li>
+						<li><a href="#">Essays</a></li>
+						<li><a href="#">Programming</a></li>
+						<li><a href="#">Review</a></li>
+					</ol>
+				</div>
+			</aside>
+		</div>
+	</main>
+
+	<footer class="site-footer">
+		<div class="container">
+			<div class="mountain"></div>
+			<div class="d-flex flex-wrap justify-content-between mono"><span>© 2026 Mu-Tsun Tsai</span><span>Privacy Policy</span></div>
+		</div>
+	</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

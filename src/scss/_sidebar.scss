@@ -1,0 +1,93 @@
+// 側欄小工具：每個小工具都是一張卡片，清單加上兩位數編號。
+
+.widget {
+	margin-bottom: 1.5rem;
+	padding: 1.4rem 1.6rem;
+	overflow-wrap: break-word;
+
+	&-title {
+		margin-bottom: .75rem;
+		padding-bottom: .5rem;
+		@include so-label;
+		letter-spacing: .14em;
+		line-height: 1.5;
+		color: var(--so-brown);
+		border-bottom: 1px solid var(--so-ink);
+	}
+
+	ul, ol {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		counter-reset: so-widget;
+	}
+
+	li {
+		counter-increment: so-widget;
+		display: grid;
+		grid-template-columns: 1.8rem 1fr;
+		padding: .4rem 0;
+		font-size: .92rem;
+		line-height: 1.45;
+		border-bottom: 1px dotted var(--so-rule);
+
+		&::before {
+			content: counter(so-widget, decimal-leading-zero);
+			padding-top: .15rem;
+			font-family: $font-family-monospace;
+			font-size: .72rem;
+			color: var(--so-ink-soft);
+		}
+
+		&:last-child {
+			border-bottom: 0;
+		}
+
+		// 巢狀清單（子分類、子選單）
+		ul, ol {
+			grid-column: 2;
+			margin-top: .25rem;
+		}
+
+		li:last-child {
+			padding-bottom: 0;
+		}
+	}
+
+	a {
+		color: var(--so-ink);
+
+		&:hover {
+			color: var(--so-brown);
+		}
+	}
+
+	p:last-child {
+		margin-bottom: 0;
+	}
+
+	// WordPress Popular Posts 的縮圖與附加資訊
+	.wpp-list li {
+		align-items: start;
+	}
+
+	.wpp-thumbnail {
+		float: left;
+		margin: 0 .6rem .2rem 0;
+	}
+
+	.wpp-meta,
+	.post-stats {
+		display: block;
+		@include so-label;
+		font-size: .68rem;
+	}
+}
+
+.search-form {
+	display: flex;
+
+	.form-control {
+		min-width: 0;
+	}
+}

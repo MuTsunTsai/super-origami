@@ -1,0 +1,96 @@
+// 首頁頁首：把頁首圖片當成一張「圖版」，四角加上對位標記。
+
+// 只設定上方間距；左右要保留 .container 本身的 padding，圖版才會與下方的卡片對齊
+.plate-wrap {
+	padding-top: 2.5rem;
+}
+
+.plate {
+	position: relative;
+	padding: 10px;
+	background: #fff;
+	border: 1px solid var(--so-ink);
+
+	&__image {
+		display: block;
+		width: 100%;
+		height: 260px;
+		object-fit: cover;
+		filter: sepia(.35) contrast(1.05);
+
+		@include media-breakpoint-down(sm) {
+			height: 160px;
+		}
+	}
+
+	// 對位標記：圓圈加十字。十字向外最多伸出 11px，不超過 .container 的 padding（12px），
+	// 否則手機上會出現水平捲軸
+	&__reg {
+		position: absolute;
+		width: 14px;
+		height: 14px;
+		border: 1px solid var(--so-brown);
+		border-radius: 50%;
+
+		&::before,
+		&::after {
+			content: "";
+			position: absolute;
+			background: var(--so-brown);
+		}
+
+		&::before {
+			top: -4px;
+			bottom: -4px;
+			left: 50%;
+			width: 1px;
+		}
+
+		&::after {
+			top: 50%;
+			right: -4px;
+			left: -4px;
+			height: 1px;
+		}
+
+		&--tl { top: -7px; left: -7px; }
+		&--tr { top: -7px; right: -7px; }
+		&--bl { bottom: -7px; left: -7px; }
+		&--br { right: -7px; bottom: -7px; }
+	}
+
+	&-caption {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 0 1rem;
+		margin-top: .8rem;
+	}
+}
+
+.tagline {
+	margin: 1.5rem 0 0;
+	font-family: $font-family-serif;
+	font-size: 1.6rem;
+	font-style: italic;
+	line-height: 1.3;
+}
+
+// 彙整、搜尋頁的標頭
+.archive-header {
+	padding-top: 2.5rem;
+
+	&__title {
+		margin: .25rem 0 0;
+		font-size: 2.6rem;
+	}
+
+	&__description {
+		margin-top: .75rem;
+		color: var(--so-ink-soft);
+
+		> :last-child {
+			margin-bottom: 0;
+		}
+	}
+}

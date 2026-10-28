@@ -1,0 +1,94 @@
+// 文章列表：像圖錄的條目，左欄是 FIG 編號。
+
+.entry-item {
+	display: grid;
+	grid-template-columns: 5.5rem 1fr;
+	gap: 0 1.5rem;
+	padding: 1.75rem 2rem;
+	border-bottom: 1px solid var(--so-rule);
+
+	&:last-child {
+		border-bottom: 0;
+	}
+
+	&__fig {
+		align-self: start;
+		padding-top: .55rem;
+		font-family: $font-family-monospace;
+		font-size: .75rem;
+		letter-spacing: .08em;
+		color: var(--so-brown);
+		border-top: 2px solid var(--so-brown);
+
+		b {
+			display: block;
+			margin-top: .3rem;
+			font-family: $font-family-serif;
+			font-size: 2.4rem;
+			font-weight: 600;
+			font-variant-numeric: lining-nums;
+			line-height: 1;
+			letter-spacing: 0;
+			color: var(--so-ink);
+		}
+	}
+
+	&__meta a {
+		color: inherit;
+
+		&:hover {
+			color: var(--so-brown);
+		}
+	}
+
+	&__title {
+		margin: .2rem 0 .5rem;
+		font-size: 1.95rem;
+
+		a {
+			color: var(--so-ink);
+
+			&:hover {
+				color: var(--so-brown);
+			}
+		}
+	}
+
+	&__excerpt {
+		color: #4a423b;
+
+		p {
+			margin-bottom: .4rem;
+		}
+	}
+
+	&__more {
+		@include so-label;
+		color: var(--so-brown);
+	}
+
+	@include media-breakpoint-down(sm) {
+		grid-template-columns: 1fr;
+		padding: 1.5rem 1.25rem;
+
+		&__fig {
+			display: flex;
+			align-items: baseline;
+			gap: .75rem;
+			padding: 0;
+			border: 0;
+
+			b {
+				font-size: 1.2rem;
+			}
+		}
+	}
+}
+
+.no-results {
+	padding: 2rem;
+
+	.search-form {
+		max-width: 24rem;
+	}
+}

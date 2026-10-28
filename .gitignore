@@ -1,0 +1,8 @@
+node_modules/
+theme/dist/
+src/generated/
+*.zip
+
+# 個人筆記與 AI 協作設定，不公開
+NOTE.md
+CLAUDE.md

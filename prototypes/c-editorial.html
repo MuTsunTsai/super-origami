@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Prototype C：極簡編輯</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=Noto+Serif+TC:wght@500;700&family=Inter:wght@400..600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css" rel="stylesheet">
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+	<script defer src="shared.js"></script>
+	<style>
+		:root {
+			--paper: #faf7f1;
+			--ink: #221d19;
+			--ink-soft: #7a6e63;
+			--brown: #8b4513;
+			--brown-deep: #5c2d0e;
+			--rule: #e2d8c8;
+			--serif: "Newsreader", "Noto Serif TC", serif;
+			--sans: "Inter", "PingFang TC", "Microsoft JhengHei", sans-serif;
+			--mono: "JetBrains Mono", Consolas, monospace;
+			--measure: 42rem;
+		}
+		body { background: var(--paper); color: var(--ink); font-family: var(--serif); font-size: 1.2rem; line-height: 1.7; }
+		body::before {
+			content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; mix-blend-mode: multiply; background-size: 280px 280px;
+			background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='280' height='280'><filter id='n' x='0' y='0' width='100%' height='100%'><feTurbulence type='fractalNoise' baseFrequency='0.21' numOctaves='1' seed='27' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.349  0 0 0 0 0.251  0 0 0 0 0.157  0 0 0 0.08 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+		}
+		.page { position: relative; z-index: 1; }
+		a { color: var(--brown); text-underline-offset: 4px; text-decoration-thickness: 1px; }
+		.measure { max-width: var(--measure); margin-inline: auto; padding-inline: 1.25rem; }
+		.sans { font-family: var(--sans); }
+		.small-caps { font-family: var(--sans); font-size: .75rem; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft); }
+
+		/* 頁首：只有一條棕色細線和書法 logo */
+		.topbar { border-top: 5px solid var(--brown); }
+		.topbar .inner { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; max-width: 72rem; margin: auto; font-family: var(--sans); font-size: .85rem; }
+		.topbar a { color: var(--ink); text-decoration: none; margin-left: 1.5rem; }
+		.topbar a:hover { color: var(--brown); }
+		.masthead { text-align: center; padding: 3.5rem 1rem 3rem; }
+		.masthead img { height: 4.5rem; filter: brightness(0) saturate(100%) invert(26%) sepia(60%) saturate(1500%) hue-rotate(10deg) brightness(80%); }
+		.masthead h1 { font-size: 1.1rem; font-family: var(--sans); font-weight: 600; letter-spacing: .4em; text-transform: uppercase; margin: 1.25rem 0 .4rem; }
+		.masthead p { font-style: italic; color: var(--ink-soft); margin: 0; }
+		.crease { height: 1px; background: var(--rule); position: relative; max-width: 72rem; margin: 0 auto; }
+		.crease::after { content: ""; position: absolute; left: 50%; top: -5px; width: 11px; height: 11px; margin-left: -5px; background: var(--paper); border: 1px solid var(--brown); transform: rotate(45deg); }
+
+		/* 列表：大標題、日期在左側邊欄 */
+		.feed { max-width: 56rem; margin: 3rem auto; padding: 0 1.25rem; }
+		.entry { display: grid; grid-template-columns: 9rem 1fr; gap: 2rem; padding: 2.25rem 0; border-bottom: 1px solid var(--rule); }
+		.entry time { font-family: var(--sans); font-size: .8rem; color: var(--ink-soft); padding-top: .9rem; line-height: 1.5; }
+		.entry time b { display: block; color: var(--brown); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; font-size: .7rem; }
+		.entry h2 { font-size: 2.4rem; font-weight: 500; line-height: 1.1; letter-spacing: -.01em; margin: 0 0 .75rem; }
+		.entry h2 a { color: var(--ink); text-decoration: none; }
+		.entry h2 a:hover { color: var(--brown); }
+		.entry p { color: #4a4038; margin: 0; font-size: 1.1rem; }
+
+		/* 單篇 */
+		.divider-label { text-align: center; margin: 4rem 0 0; }
+		.article-head { text-align: center; padding: 3rem 1.25rem 2rem; max-width: 52rem; margin: auto; }
+		.article-head h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 500; line-height: 1.08; letter-spacing: -.015em; margin: 1rem 0; }
+		.article p, .article li { font-size: 1.2rem; }
+		.article > p:first-of-type::first-letter { float: left; font-size: 4.2rem; line-height: .9; padding: .35rem .6rem 0 0; color: var(--brown); font-weight: 500; }
+		.article h2 { font-size: 1.9rem; font-weight: 500; margin: 3rem 0 1rem; }
+		.article figure { margin: 2.5rem -6rem; text-align: center; }
+		.article figure img { max-width: 100%; mix-blend-mode: multiply; }
+		.article figcaption { font-family: var(--sans); font-size: .85rem; color: var(--ink-soft); margin-top: .75rem; }
+		.article blockquote { margin: 2.5rem 0; text-align: center; font-size: 1.6rem; font-style: italic; line-height: 1.4; color: var(--brown-deep); padding: 0 2rem; }
+		.article blockquote::before { content: "“"; display: block; font-size: 4rem; line-height: .5; color: var(--brown); opacity: .4; }
+		.article :not(pre) > code { font-family: var(--mono); font-size: .78em; background: rgba(139, 69, 19, .07); color: var(--brown-deep); padding: .1em .3em; border-radius: 3px; }
+		.article pre { font-family: var(--mono); font-size: .9rem; line-height: 1.65; background: #f3ede2; padding: 1.25rem 1.5rem; margin: 2rem -2rem; border-radius: 4px; }
+		.tok-k { color: #a0451b; } .tok-t { color: #2f6f73; } .tok-s { color: #5f7f2a; } .tok-c { color: #9a8b7a; font-style: italic; } .tok-n { color: #7b4fa0; }
+		.article kbd { font-family: var(--mono); font-size: .7em; background: #fff; color: var(--ink); border: 1px solid var(--rule); box-shadow: 0 1px 0 var(--rule); }
+		.katex-block { margin: 2rem 0; overflow-x: auto; }
+		sup a { text-decoration: none; font-family: var(--sans); font-size: .75rem; font-weight: 600; }
+		.footnotes { font-family: var(--sans); font-size: .9rem; color: var(--ink-soft); border-top: 1px solid var(--rule); padding-top: 1rem; margin-top: 3rem; }
+		.footnotes li { font-size: .9rem !important; }
+		.feg { border-bottom: 1px dashed var(--brown); cursor: help; }
+		.feg-popover { display: none; position: absolute; z-index: 10; max-width: 300px; background: var(--ink); color: #f5efe5; padding: .8rem 1rem; font-family: var(--sans); font-size: .85rem; line-height: 1.5; border-radius: 4px; }
+		.feg-popover b { display: block; font-family: var(--serif); font-size: 1.1rem; font-weight: 500; color: #e8b98f; }
+
+		/* 側欄內容改放頁尾 */
+		.site-footer { margin-top: 5rem; border-top: 1px solid var(--rule); padding: 3rem 0 2rem; }
+		.site-footer h3 { margin-bottom: .75rem; }
+		.site-footer ul { list-style: none; padding: 0; font-family: var(--sans); font-size: .9rem; line-height: 1.5; }
+		.site-footer li { margin-bottom: .55rem; }
+		.site-footer li a { color: var(--ink); text-decoration: none; }
+		.site-footer li a:hover { color: var(--brown); }
+		.site-footer input { border: 0; border-bottom: 1px solid var(--ink); background: transparent; width: 100%; padding: .35rem 0; font-family: var(--serif); font-size: 1.1rem; outline: none; }
+
+		@media (max-width: 767.98px) {
+			.entry { grid-template-columns: 1fr; gap: .5rem; }
+			.entry time { padding: 0; }
+			.entry h2 { font-size: 1.85rem; }
+			.article figure { margin-inline: 0; }
+			.article pre { margin-inline: 0; }
+		}
+	</style>
+</head>
+<body>
+<div class="page">
+	<div class="topbar">
+		<div class="inner">
+			<span class="small-caps">Tsai Origami</span>
+			<nav><a href="#">Glossary</a><a href="#">About</a><a href="#">Search</a><a href="#">繁中</a></nav>
+		</div>
+	</div>
+	<header class="masthead">
+		<img src="https://origami.abstreamace.com/wp-content/uploads/2021/05/162233760685302-1.png" alt="牧村摺紙">
+		<h1>Tsai Origami</h1>
+		<p>Origami works, research and programming by Mu-Tsun Tsai</p>
+	</header>
+	<div class="crease"></div>
+
+	<main>
+		<section class="feed">
+			<article class="entry">
+				<time><b>Designs</b>June 19, 2025</time>
+				<div>
+					<h2><a href="#">Impressionist Bat, 2013</a></h2>
+					<p>This is one of my earliest original designs, yet even to this day, it remains one of the works I am most satisfied with—primarily because of the successful <span class="feg" data-content="<b>Shaping</b>The final stage of folding where the base is refined into the subject's form.">shaping</span> of the head…</p>
+				</div>
+			</article>
+			<article class="entry">
+				<time><b>Designs</b>September 11, 2023</time>
+				<div>
+					<h2><a href="#">Pinwheel without cuts, 2016</a></h2>
+					<p>I was deeply honored to receive an invitation to teach at the 4th Origami World Marathon (OWM4). Among the various origami models I proposed…</p>
+				</div>
+			</article>
+			<article class="entry">
+				<time><b>Essays</b>December 12, 2021</time>
+				<div>
+					<h2><a href="#">Geography of Origami – A Brief Introduction to the Edge-River Method</a></h2>
+					<p>Recently I had been discussing my edge-river method (ERM) with several folders on Discord and received fairly good responses…</p>
+				</div>
+			</article>
+			<div class="text-center mt-4 sans"><a href="#">Older posts →</a></div>
+		</section>
+
+		<p class="divider-label small-caps">— single post —</p>
+		<header class="article-head">
+			<div class="small-caps">Essays · December 12, 2021 · 4 comments</div>
+			<h1>Geography of Origami – A Brief Introduction to the Edge-River Method</h1>
+		</header>
+		<div class="crease mb-5" style="max-width: 42rem"></div>
+		<article class="article measure">
+			<p>Recently I had been discussing my edge-river method (ERM) with several folders on Discord and received fairly good responses. I will assume that the readers are considerably familiar with the <span class="feg" data-content="<b>Tree method</b>A design technique that represents the subject as a stick figure and solves a circle/river packing.">tree method</span> (developed by Lang and Meguro, etc.).</p>
+			<h2>Overview</h2>
+			<p>To put it simply, ERM is a generalization of the tree method to any origami design, let it be uniaxial or not. Roughly speaking, the tree method can be thought of as a design process consisting of the following steps:</p>
+			<ol>
+				<li>Represent the target subject as a tree figure.</li>
+				<li>Solve the circle/river packing problem to decide the correspondence between regions on the sheet and components on the tree.</li>
+				<li>Construct a flat-foldable crease pattern for the packing, so that the sheet collapses to a base resembling the tree.<sup><a href="#">1</a></sup></li>
+			</ol>
+			<figure>
+				<img src="https://origami.abstreamace.com/wp-content/uploads/2021/08/image-1630831358273.png" alt="">
+				<figcaption>Figure 1. 1D vs 2D animal.</figcaption>
+			</figure>
+			<p>For a grid of size <code class="katex-inline">n \times n</code>, each flap of length <code class="katex-inline">\ell</code> consumes a river of width <code class="katex-inline">w = \ell / \sqrt{2}</code>, so that the total area satisfies</p>
+			<pre><code class="language-katex">\sum_{i} \pi r_i^2 + \sum_{j} w_j L_j \le n^2</code></pre>
+			<blockquote><p>An abstraction can be viewed as the specification given by the designer for the desired shape of the folded base.</p></blockquote>
+			<h2>Implementation</h2>
+			<p>Press <kbd>Ctrl</kbd> + <kbd>Z</kbd> to undo. In <code>Orihime</code>, the core loop looks like this:</p>
+<pre><code><span class="tok-c">// Fold every crease that lies on the current layer</span>
+<span class="tok-k">for</span> (<span class="tok-t">LineSegment</span> s : creases) {
+	<span class="tok-k">if</span> (s.<span class="tok-n">getColor</span>() == <span class="tok-t">LineColor</span>.RED_1) {
+		folder.<span class="tok-n">fold</span>(s, <span class="tok-s">"mountain"</span>);
+	}
+}</code></pre>
+			<div class="footnotes"><ol><li>In some cases, it might be necessary to use 2-unit wide peninsulas due to the parity principle of box pleating. <a href="#">↩</a></li></ol></div>
+		</article>
+	</main>
+
+	<footer class="site-footer">
+		<div class="container" style="max-width: 72rem">
+			<div class="row g-5">
+				<div class="col-md-4"><h3 class="small-caps">Search</h3><input placeholder="Type and press Enter…"></div>
+				<div class="col-md-4"><h3 class="small-caps">Popular</h3><ul>
+					<li><a href="#">Geography of Origami – A Brief Introduction to the Edge-River Method</a></li>
+					<li><a href="#">The story of Box Pleating Studio</a></li>
+					<li><a href="#">Sauwastika, 2021</a></li>
+				</ul></div>
+				<div class="col-md-4"><h3 class="small-caps">Categories</h3><ul>
+					<li><a href="#">Designs</a></li><li><a href="#">Essays</a></li><li><a href="#">Programming</a></li><li><a href="#">Review</a></li>
+				</ul></div>
+			</div>
+			<div class="d-flex justify-content-between small-caps mt-4 pt-3" style="border-top: 1px solid var(--rule)"><span>© 2026 Mu-Tsun Tsai</span><span>Privacy</span></div>
+		</div>
+	</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,120 @@
+// 留言區。
+
+.comments-area {
+	margin-top: 1.5rem;
+	padding: 2rem 2.5rem;
+
+	@include media-breakpoint-down(sm) {
+		padding: 1.5rem 1.25rem;
+	}
+
+	.section-title {
+		margin-bottom: 1.25rem;
+		padding-bottom: .5rem;
+		@include so-label;
+		letter-spacing: .14em;
+		color: var(--so-brown);
+		border-bottom: 1px solid var(--so-ink);
+	}
+}
+
+.comment-list {
+	margin: 0 0 2rem;
+	padding: 0;
+	list-style: none;
+
+	.children {
+		margin: 0;
+		padding-left: 1.5rem;
+		list-style: none;
+		border-left: 1px dotted var(--so-rule);
+	}
+}
+
+.comment-card {
+	padding: 1rem 0;
+	border-bottom: 1px dotted var(--so-rule);
+
+	&__header {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: .25rem .75rem;
+		margin-bottom: .5rem;
+	}
+
+	&__avatar {
+		width: 36px;
+		height: 36px;
+		border: 1px solid var(--so-rule);
+	}
+
+	&__author {
+		font-style: normal;
+		font-weight: 600;
+
+		a {
+			color: var(--so-ink);
+		}
+	}
+
+	&__badge {
+		padding: 0 .4rem;
+		@include so-label;
+		font-size: .65rem;
+		color: #fff;
+		background: var(--so-brown);
+	}
+
+	&__time {
+		@include so-label;
+		font-size: .7rem;
+	}
+
+	&__actions {
+		display: flex;
+		gap: .75rem;
+		margin-left: auto;
+		@include so-label;
+	}
+
+	&__body {
+		font-size: .95rem;
+
+		> :last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	&__moderation {
+		font-style: italic;
+		color: var(--so-ink-soft);
+	}
+}
+
+.comment-respond {
+	.comment-reply-title {
+		small {
+			margin-left: .75rem;
+			text-transform: none;
+		}
+	}
+
+	.comment-notes,
+	.logged-in-as {
+		font-size: .85rem;
+		color: var(--so-ink-soft);
+	}
+
+	.comment-form > p,
+	.comment-form > div {
+		margin-bottom: 1rem;
+	}
+
+	.comment-form-cookies-consent {
+		display: flex;
+		gap: .5rem;
+		align-items: baseline;
+		font-size: .85rem;
+	}
+}

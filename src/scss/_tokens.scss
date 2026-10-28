@@ -1,0 +1,73 @@
+// 佈景主題自己的設計 token（CSS 自訂屬性），前綴 --so-。
+
+:root {
+	--so-paper: #{$body-bg};
+	--so-ink: #{$body-color};
+	--so-ink-soft: #{$body-secondary-color};
+	--so-brown: #{$brown};
+	--so-brown-deep: #5a2c0c;
+	--so-maroon: #7a1f12;
+	--so-rule: #{$border-color};
+	--so-grid: rgba(#{to-rgb($brown)}, .055);
+	--so-grid-major: rgba(#{to-rgb($brown)}, .1);
+	--so-highlight: rgba(255, 214, 10, .45);
+
+	--so-serif: #{inspect($font-family-serif)};
+	--so-mono: #{inspect($font-family-monospace)};
+}
+
+// ----- 山線（一點鏈線，點為圓點） -----
+
+// 一個週期：槓（14px）＋兩個圓點（直徑 2.8px，比 2px 的線稍粗）
+$so-mountain-tile: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='28' height='4' fill='%238b4513'><rect x='0' y='1' width='14' height='2'/><circle cx='18.5' cy='2' r='1.4'/><circle cx='23.5' cy='2' r='1.4'/></svg>");
+
+/// 把元素畫成一條山線。仿照 Inkscape「Pattern along path」的「重複、伸展」：
+/// 週期以 round 伸縮成整數個，右側 padding 再補一段槓，讓線的兩端都收在槓上。
+@mixin so-mountain-line {
+	height: 4px;
+	padding: 0 14px 0 0;
+	border: 0;
+	opacity: .6;
+	background:
+		$so-mountain-tile left center / 28px 4px round no-repeat content-box,
+		linear-gradient($brown, $brown) right center / 14px 2px no-repeat border-box;
+	background-origin: content-box, border-box;
+	background-clip: content-box, border-box;
+}
+
+// ----- 箱形褶角落 -----
+
+// 左上角的摺痕（間距 u = 5px）：對角線長 3.2u；離邊 1u 的 L 形臂長 12u；離邊 2u 的 L 形臂長 4u
+$so-corner-size: 66px;
+$so-corner-path: "M0 0L16 16M5 5H65M5 5V65M10 10H30M10 10V30";
+
+@function so-corner($matrix) {
+	@return url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='66' height='66'><path d='#{$so-corner-path}' fill='none' stroke='black' stroke-width='1' transform='matrix(#{$matrix})'/></svg>");
+}
+
+/// 在元素四角畫上箱形褶角落的摺痕；線寬與顏色同卡片外框。元素本身需為定位容器。
+@mixin so-box-pleat-corners {
+	&::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background: var(--so-rule);
+		$mask:
+			so-corner("1 0 0 1 0 0") top left / $so-corner-size no-repeat,
+			so-corner("-1 0 0 1 66 0") top right / $so-corner-size no-repeat,
+			so-corner("1 0 0 -1 0 66") bottom left / $so-corner-size no-repeat,
+			so-corner("-1 0 0 -1 66 66") bottom right / $so-corner-size no-repeat;
+		-webkit-mask: $mask;
+		mask: $mask;
+	}
+}
+
+// 等寬的小型大寫標籤（中繼資料、小工具標題等）
+@mixin so-label {
+	font-family: $font-family-monospace;
+	font-size: .75rem;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+	color: var(--so-ink-soft);
+}

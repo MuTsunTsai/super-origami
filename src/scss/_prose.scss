@@ -1,0 +1,353 @@
+// 單篇文章與頁面。
+
+.article {
+	padding: 3rem 3.5rem;
+
+	@include media-breakpoint-down(sm) {
+		padding: 1.75rem 1.25rem;
+	}
+
+	&__title {
+		margin: .5rem 0 1rem;
+		font-size: 2.9rem;
+		line-height: 1.08;
+
+		@include media-breakpoint-down(sm) {
+			font-size: 2.1rem;
+		}
+	}
+
+	// 中繼資料列：上方粗線、下方細線，像圖面的標題欄
+	&__meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: .5rem 1.75rem;
+		margin-bottom: 2rem;
+		padding: .6rem 0;
+		border-top: 1px solid var(--so-ink);
+		border-bottom: 1px solid var(--so-rule);
+
+		span {
+			display: block;
+			font-family: $font-family-sans-serif;
+			font-size: .85rem;
+			letter-spacing: 0;
+			text-transform: none;
+			color: var(--so-ink);
+		}
+
+		a {
+			color: inherit;
+
+			&:hover {
+				color: var(--so-brown);
+			}
+		}
+	}
+
+	&__thumbnail {
+		margin: 0 0 2rem;
+
+		img {
+			display: block;
+			max-width: 100%;
+			height: auto;
+			margin: 0 auto;
+		}
+	}
+
+	&__footer {
+		margin-top: 2.5rem;
+	}
+
+	&__tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: .25rem 1rem;
+
+		a {
+			color: var(--so-brown);
+		}
+	}
+}
+
+.entry-content {
+	overflow-wrap: break-word;
+	counter-reset: so-section;
+
+	> :first-child {
+		margin-top: 0;
+	}
+
+	// ----- 標題：h2 加上 § 編號 -----
+
+	h2 {
+		counter-increment: so-section;
+		margin: 2.5rem 0 1rem;
+		font-size: 1.85rem;
+
+		&::before {
+			content: "§" counter(so-section);
+			margin-right: .6rem;
+			font-family: $font-family-monospace;
+			font-size: .9rem;
+			font-weight: 400;
+			vertical-align: .35em;
+			color: var(--so-brown);
+		}
+	}
+
+	h3 {
+		margin: 2rem 0 .75rem;
+		font-size: 1.5rem;
+	}
+
+	h4 {
+		margin: 1.75rem 0 .75rem;
+		font-size: 1.25rem;
+	}
+
+	// ----- 段落與清單 -----
+
+	p, ul, ol, dl, blockquote, figure, table {
+		margin-bottom: 1.25rem;
+	}
+
+	li {
+		margin: .3em 0;
+
+		&::marker {
+			font-family: $font-family-monospace;
+			font-size: .875em;
+			color: var(--so-brown);
+		}
+	}
+
+	hr {
+		@include so-mountain-line;
+		margin: 2.5rem 0;
+	}
+
+	blockquote {
+		padding-left: 1.25rem;
+		font-family: $font-family-serif;
+		font-size: 1.3rem;
+		font-style: italic;
+		line-height: 1.5;
+		border-left: 1px solid var(--so-ink);
+
+		> :last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	// ----- 圖片：不加外框，直接融進白色卡片 -----
+
+	img {
+		max-width: 100%;
+		height: auto;
+	}
+
+	figure {
+		margin: 2rem 0;
+		text-align: center;
+
+		img {
+			display: block;
+			margin: 0 auto;
+		}
+	}
+
+	figcaption {
+		margin-top: .5rem;
+		font-family: $font-family-monospace;
+		font-size: .75rem;
+		letter-spacing: .04em;
+		color: var(--so-ink-soft);
+	}
+
+	// ----- 表格 -----
+
+	table {
+		display: block;
+		width: max-content;
+		max-width: 100%;
+		overflow-x: auto;
+		font-size: .9375rem;
+		border-collapse: collapse;
+
+		th, td {
+			padding: .4em .9em;
+			border: 1px solid var(--so-rule);
+		}
+
+		th {
+			font-family: $font-family-monospace;
+			font-size: .8rem;
+			font-weight: 500;
+			letter-spacing: .04em;
+			border-bottom-color: var(--so-ink);
+		}
+	}
+
+	// ----- 行內程式碼與按鍵 -----
+
+	:not(pre) > code {
+		padding: .05em .3em;
+		font-size: .85em;
+		color: var(--so-brown-deep);
+		background: rgba($brown, .07);
+	}
+
+	kbd {
+		padding: .05em .4em;
+		font-family: $font-family-monospace;
+		font-size: .78em;
+		color: var(--so-ink);
+		background: #fff;
+		border: 1px solid var(--so-ink);
+		border-radius: 2px;
+		box-shadow: 0 2px 0 var(--so-ink);
+	}
+
+	// ----- 註腳（WP Githuber MD） -----
+
+	sup {
+		line-height: 0;
+	}
+
+	a.footnote-ref {
+		font-family: $font-family-monospace;
+		font-size: .75rem;
+
+		&::before { content: "["; }
+		&::after { content: "]"; }
+	}
+
+	.footnotes {
+		margin-top: 3rem;
+		font-size: .875rem;
+		color: var(--so-ink-soft);
+
+		> hr {
+			margin: 0 0 1.5rem;
+		}
+
+		li::marker {
+			font-size: .8em;
+		}
+
+		p {
+			margin-bottom: .5rem;
+		}
+	}
+
+	.footnote-backref {
+		margin-left: .3em;
+		font-family: $font-family-monospace;
+		font-variant-emoji: text;
+	}
+
+	// ----- 嵌入內容 -----
+
+	iframe,
+	video {
+		max-width: 100%;
+	}
+}
+
+// 註腳預覽（src/ts/footnotes.ts）
+.footnote-tip {
+	position: absolute;
+	z-index: 1080;
+	width: max-content;
+	max-width: min(26rem, calc(100vw - 1rem));
+	padding: .75rem 1rem;
+	font-size: .875rem;
+	line-height: 1.6;
+	background: #fff;
+	border: 1px solid var(--so-ink);
+	box-shadow: 4px 4px 0 rgba($brown, .2);
+
+	> :last-child,
+	p:last-child {
+		margin-bottom: 0;
+	}
+
+	:not(pre) > code {
+		padding: .05em .3em;
+		font-size: .85em;
+		color: var(--so-brown-deep);
+		background: rgba($brown, .07);
+	}
+}
+
+// 摺紙詞彙表（front-end-glossary 外掛）的詞彙與浮動說明
+.feg {
+	cursor: help;
+	border-bottom: 1px dotted var(--so-brown);
+}
+
+.feg-popover {
+	position: absolute;
+	z-index: 1080;
+	max-width: min(20rem, calc(100vw - 1rem));
+	padding: .75rem 1rem;
+	font-size: .875rem;
+	line-height: 1.5;
+	background: #fff;
+	border: 1px solid var(--so-ink);
+	box-shadow: 4px 4px 0 rgba($brown, .2);
+
+	&__title {
+		display: block;
+		margin-bottom: .2rem;
+		@include so-label;
+		letter-spacing: .12em;
+		color: var(--so-brown);
+	}
+
+	&__more {
+		display: block;
+		margin-top: .4rem;
+		font-family: $font-family-monospace;
+		font-size: .75rem;
+	}
+}
+
+// 文章上一篇／下一篇
+.post-navigation {
+	margin-top: 1.5rem;
+
+	.nav-links {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1.5rem;
+	}
+
+	.nav-next {
+		grid-column: 2;
+		text-align: right;
+	}
+
+	a {
+		display: block;
+		color: var(--so-ink);
+
+		&:hover .nav-title {
+			color: var(--so-brown);
+		}
+	}
+
+	.nav-label {
+		display: block;
+		@include so-label;
+	}
+
+	.nav-title {
+		font-family: $font-family-serif;
+		font-size: 1.25rem;
+		font-weight: 600;
+		line-height: 1.25;
+	}
+}

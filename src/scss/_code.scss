@@ -1,0 +1,125 @@
+// 程式碼區塊（Shiki）與數學式（KaTeX）。
+
+$code-bg: #fdfcf8;
+
+code, kbd, samp, pre {
+	font-family: $font-family-monospace;
+}
+
+// Shiki 渲染前的佔位樣式，讓畫面不會在渲染完成時大幅跳動
+.entry-content pre {
+	margin-bottom: 1.5rem;
+	padding: 1rem 1.25rem;
+	overflow-x: auto;
+	font-size: .85rem;
+	line-height: 1.65;
+	tab-size: 4;
+	background: $code-bg;
+	border: 1px solid var(--so-ink);
+
+	code {
+		font-size: inherit;
+		color: inherit;
+		background: none;
+		padding: 0;
+	}
+}
+
+.code-block {
+	position: relative;
+	margin: 2rem 0 1.5rem;
+
+	// 語言標籤：壓在上框線上，像圖面的標注
+	&[data-lang]::before {
+		content: attr(data-lang);
+		position: absolute;
+		z-index: 1;
+		top: -.6rem;
+		right: 1rem;
+		padding: 0 .4rem;
+		font-family: $font-family-monospace;
+		font-size: .68rem;
+		line-height: 1.2rem;
+		letter-spacing: .12em;
+		text-transform: uppercase;
+		color: var(--so-brown);
+		background: $code-bg;
+	}
+
+	pre {
+		margin: 0;
+	}
+
+	// Shiki 會以 inline style 指定主題的底色，改成紙色
+	pre.shiki {
+		background-color: $code-bg !important;
+	}
+
+	// 複製按鈕浮在右上角，滑鼠移入區塊時才出現；觸控裝置則一直淡淡地顯示
+	&__copy {
+		position: absolute;
+		top: .6rem;
+		right: .6rem;
+		display: grid;
+		place-items: center;
+		width: 1.9rem;
+		height: 1.9rem;
+		padding: 0;
+		font-size: .875rem;
+		color: var(--so-ink-soft);
+		background: #fff;
+		border: 1px solid var(--so-rule);
+		opacity: 0;
+		transition: opacity .15s, color .15s, border-color .15s;
+
+		@media (hover: none) {
+			opacity: .7;
+		}
+
+		&:hover {
+			color: var(--so-brown);
+			border-color: var(--so-brown);
+		}
+
+		&:focus-visible,
+		&.is-copied {
+			opacity: 1;
+		}
+
+		&.is-copied {
+			color: $success;
+		}
+	}
+
+	&:hover &__copy {
+		opacity: 1;
+	}
+}
+
+// ----- KaTeX -----
+
+.katex {
+	font-size: 1.05em;
+
+	// 給螢幕報讀器的 MathML 雖然被 clip 隱藏，寬度仍會撐出水平捲軸
+	.katex-mathml {
+		max-width: 1px;
+		overflow: hidden;
+	}
+}
+
+.math-block {
+	margin: 1.5rem 0;
+	padding: 1rem;
+	overflow-x: auto;
+	overflow-y: hidden;
+	text-align: center;
+	border-top: 1px dashed var(--so-rule);
+	border-bottom: 1px dashed var(--so-rule);
+}
+
+.math-error {
+	font-family: $font-family-monospace;
+	font-size: .85rem;
+	color: $danger;
+}

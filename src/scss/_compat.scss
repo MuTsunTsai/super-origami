@@ -1,0 +1,39 @@
+// 與既有內容、外掛的相容樣式。
+
+// ----- 中文版（TranslatePress 的 /zh/）-----
+
+// 中文沒有真正的斜體，強調改用一般字形
+html[lang="zh-TW"] .entry-content em {
+	font-style: normal;
+}
+
+// 中文標題不要在詞的中間斷行
+html[lang="zh-TW"] h1 {
+	word-break: keep-all;
+}
+
+// ----- 舊文章內容裡殘留的 Bootstrap 4 class -----
+
+.pr-4 {
+	padding-right: map-get($spacers, 4) !important;
+}
+
+@include media-breakpoint-up(lg) {
+	.float-lg-left {
+		float: left !important;
+	}
+}
+
+// ----- Super Socializer 分享按鈕 -----
+
+.the_champ_counter_container {
+	height: 2.5rem;
+
+	ul {
+		list-style-type: none;
+	}
+}
+
+ul.the_champ_sharing_ul {
+	padding: 0;
+}
