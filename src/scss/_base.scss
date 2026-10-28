@@ -3,6 +3,10 @@
 html {
 	// 從錨點跳轉時，目標不要貼齊視窗頂端
 	scroll-padding-top: 1.5rem;
+
+	@media (prefers-reduced-motion: no-preference) {
+		scroll-behavior: smooth;
+	}
 }
 
 // 注意：不要在 body 上設定 position，會影響 WordPress admin bar 與外掛的定位
@@ -63,8 +67,8 @@ a:hover {
 	text-transform: uppercase;
 }
 
-// 從錨點連結（例如註腳）跳轉過來時，目標短暫高亮
-:target {
+// 從錨點連結（例如註腳）跳轉過來時，目標短暫高亮；留言表單（回覆留言時跳轉）不需要
+:target:not(#respond) {
 	animation: so-target-flash 2.5s ease-out;
 }
 

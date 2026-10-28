@@ -5,7 +5,9 @@
 	padding: 1.4rem 1.6rem;
 	overflow-wrap: break-word;
 
-	&-title {
+	// .widgettitle：區塊小工具中，WordPress Popular Posts 自己輸出的標題
+	&-title,
+	.widgettitle {
 		margin-bottom: .75rem;
 		padding-bottom: .5rem;
 		@include so-label;

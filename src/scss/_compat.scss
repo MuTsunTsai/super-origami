@@ -12,10 +12,45 @@ html[lang="zh-TW"] h1 {
 	word-break: keep-all;
 }
 
-// ----- 舊文章內容裡殘留的 Bootstrap 4 class -----
+// 只在某個語言顯示的內容（文章、小工具、詞彙表短代碼中都有使用）
+html[lang="en-US"] .zh-tw-only,
+html[lang="zh-TW"] .en-us-only {
+	display: none !important;
+}
+
+// ----- TranslatePress 語言切換器 -----
+
+// 小工具中，切換器與旁邊的「摺紙詞彙表」連結排在同一行
+.trp_language_switcher_shortcode {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.trp-language-switcher > div {
+	background-position: calc(100% - 12px) 1em, calc(100% - 7.5px) 1em;
+}
+
+// ----- 摺紙詞彙表（front-end-glossary 的 [feglossary] 短代碼）-----
+
+// 中文詞彙的翻譯說明；英文版只淡淡地顯示
+.feg-exp {
+	display: block;
+	margin-top: .5rem;
+	font-size: 80%;
+}
+
+html[lang="en-US"] .feg-exp {
+	opacity: .3;
+}
+
+// ----- 舊內容裡殘留的 Bootstrap 4 class -----
 
 .pr-4 {
 	padding-right: map-get($spacers, 4) !important;
+}
+
+.ml-3 {
+	margin-left: map-get($spacers, 3) !important;
 }
 
 @include media-breakpoint-up(lg) {
@@ -36,4 +71,29 @@ html[lang="zh-TW"] h1 {
 
 ul.the_champ_sharing_ul {
 	padding: 0;
+}
+
+// ----- Modula（相簿與文章圖片燈箱）-----
+
+.modula {
+	margin-top: 1em !important;
+	margin-bottom: 1em !important;
+}
+
+// fancybox 開啟時會為了捲軸寬度加上右邊距，造成頁面左右跳動
+.compensate-for-scrollbar {
+	margin-right: 0 !important;
+}
+
+// ----- WordPress 工具列 -----
+
+// 窄螢幕上顯示留言按鈕、隱藏 Yoast SEO 選單
+@media screen and (max-width: 400px) {
+	#wpadminbar li#wp-admin-bar-comments {
+		display: inline-block;
+	}
+
+	#wpadminbar li#wp-admin-bar-wpseo-menu {
+		display: none;
+	}
 }
