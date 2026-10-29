@@ -5,16 +5,6 @@
 
 	&__widgets {
 		margin-bottom: .5rem;
-
-		.widget {
-			padding: 0;
-			background: none;
-			border: 0;
-
-			&::before {
-				content: none;
-			}
-		}
 	}
 
 	.mountain {

@@ -1,9 +1,23 @@
-// 側欄小工具：每個小工具都是一張卡片，清單加上兩位數編號。
+// 側欄小工具：同一個側欄的小工具共用一張卡片，彼此以山線分隔；清單加上兩位數編號。
 
-.widget {
+.site-sidebar__sheet {
 	margin-bottom: 1.5rem;
 	padding: 1.4rem 1.6rem;
+}
+
+.widget {
 	overflow-wrap: break-word;
+
+	& + & {
+		margin-top: 1.4rem;
+
+		&::before {
+			content: "";
+			display: block;
+			margin-bottom: 1.4rem;
+			@include so-mountain-line;
+		}
+	}
 
 	// .widgettitle：區塊小工具中，WordPress Popular Posts 自己輸出的標題
 	&-title,

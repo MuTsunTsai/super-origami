@@ -154,12 +154,15 @@ function super_origami_pagination() {
 
 /**
  * 頁尾的版權宣告。
+ *
+ * 取代原本頁尾小工具中的「Copyright © 年份 Mu-Tsun Tsai」。年份放在獨立的元素中，
+ * 前後兩段文字才會和原本的字串相同，沿用 TranslatePress 既有的翻譯。
  */
 function super_origami_site_info() {
 	printf(
-		'© %1$s <a href="%2$s">%3$s</a>',
+		'%1$s <span>%2$s</span> %3$s',
+		esc_html__( 'Copyright ©', 'super-origami' ),
 		esc_html( wp_date( 'Y' ) ),
-		esc_url( home_url( '/' ) ),
-		esc_html( get_bloginfo( 'name' ) )
+		'Mu-Tsun Tsai'
 	);
 }

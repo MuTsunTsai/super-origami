@@ -67,7 +67,7 @@ add_action( 'after_setup_theme', 'super_origami_content_width', 0 );
  */
 function super_origami_widgets_init() {
 	$defaults = array(
-		'before_widget' => '<section id="%1$s" class="widget sheet %2$s">',
+		'before_widget' => '<section id="%1$s" class="widget %2$s">',
 		'after_widget'  => '</section>',
 		'before_title'  => '<h2 class="widget-title">',
 		'after_title'   => '</h2>',
